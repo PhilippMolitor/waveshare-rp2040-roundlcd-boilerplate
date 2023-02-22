@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <LovyanGFX.h>
 
-class Display : public lgfx::LGFX_Device
+class LGFX_GC9A01 : public lgfx::LGFX_Device
 {
 private:
   lgfx::Panel_GC9A01 _panel_instance;

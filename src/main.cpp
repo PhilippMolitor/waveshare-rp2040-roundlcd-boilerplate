@@ -2,7 +2,7 @@
 
 #include "pinout.h"
 #include "battery.hpp"
-#include "display.hpp"
+#include "lgfx_gc9a01.hpp"
 
 //
 // application state
@@ -14,7 +14,7 @@ static Battery battery;
 // imu
 // TODO
 // display
-static Display display;
+static LGFX_GC9A01 display;
 
 void battery_tick()
 {
