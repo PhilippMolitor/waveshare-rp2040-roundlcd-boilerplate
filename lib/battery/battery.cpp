@@ -20,20 +20,6 @@ void Battery::set_voltage_ref(float voltage)
   m_voltage_ref = voltage;
 }
 
-void Battery::set_voltage_min(float voltage)
-{
-  if (voltage >= m_voltage_max)
-    return;
-  m_voltage_min = voltage;
-}
-
-void Battery::set_voltage_max(float voltage)
-{
-  if (voltage <= m_voltage_min)
-    return;
-  m_voltage_max = voltage;
-}
-
 void Battery::set_voltage_divider(float divisor)
 {
   if (divisor <= 0.0f)
