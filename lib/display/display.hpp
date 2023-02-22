@@ -1,8 +1,6 @@
 #include <Arduino.h>
 #include <LovyanGFX.h>
 
-#include "pinout.h"
-
 class Display : public lgfx::LGFX_Device
 {
 private:
@@ -11,20 +9,27 @@ private:
   lgfx::Light_PWM _light_instance;
 
 public:
-  Display()
+  inline bool begin(
+      uint16_t pin_sclk,
+      uint16_t pin_mosi,
+      uint16_t pin_miso,
+      uint16_t pin_dc,
+      uint16_t pin_cs,
+      uint16_t pin_rst,
+      uint16_t pin_bl)
   {
     // SPI bus config
     {
       auto cfg = _bus_instance.config();
 
       cfg.spi_host = 1;
-      cfg.spi_mode = 0; // SPI通信モードを設定 (0 ~ 3)
+      cfg.spi_mode = 0;
       cfg.freq_write = 40000000;
       cfg.freq_read = 16000000;
-      cfg.pin_sclk = PIN_LCD_CLK;
-      cfg.pin_mosi = PIN_LCD_MOSI;
-      cfg.pin_miso = -1;
-      cfg.pin_dc = PIN_LCD_DC;
+      cfg.pin_sclk = pin_sclk;
+      cfg.pin_mosi = pin_mosi;
+      cfg.pin_miso = pin_miso;
+      cfg.pin_dc = pin_dc;
 
       _bus_instance.config(cfg);
       _panel_instance.setBus(&_bus_instance);
@@ -34,19 +39,20 @@ public:
     {
       auto cfg = _panel_instance.config();
 
-      cfg.pin_cs = PIN_LCD_CS;
-      cfg.pin_rst = PIN_LCD_RST;
+      cfg.pin_cs = pin_cs;
+      cfg.pin_rst = pin_rst;
       cfg.pin_busy = -1;
 
       cfg.panel_width = 240;
       cfg.panel_height = 240;
+      cfg.memory_width = 240;
+      cfg.memory_height = 240;
       cfg.offset_x = 0;
       cfg.offset_y = 0;
-      cfg.offset_rotation = 0; // 回転方向の値のオフセット 0~7 (4~7は上下反転)
-      cfg.dummy_read_pixel = 8;
-      cfg.dummy_read_bits = 1;
+      cfg.offset_rotation = 0;
+      cfg.dummy_read_pixel = 16;
       cfg.readable = true;
-      cfg.invert = false;
+      cfg.invert = true;
       cfg.rgb_order = false;
       cfg.dlen_16bit = false;
       cfg.bus_shared = true;
@@ -54,12 +60,11 @@ public:
       _panel_instance.config(cfg);
     }
 
-    /*
     // LCD backlight config
     {
       auto cfg = _light_instance.config();
 
-      cfg.pin_bl = PIN_LCD_BL;
+      cfg.pin_bl = pin_bl;
       cfg.invert = false;
       cfg.freq = 44100;
       cfg.pwm_channel = 7;
@@ -67,8 +72,9 @@ public:
       _light_instance.config(cfg);
       _panel_instance.setLight(&_light_instance);
     }
-    */
 
     setPanel(&_panel_instance);
+
+    return lgfx::LGFX_Device::begin();
   }
 };

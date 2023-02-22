@@ -1,25 +1,13 @@
 #include <Arduino.h>
 
 #include "pinout.h"
-#include "display.hpp"
 #include "battery.hpp"
-
-//
-// settings
-//
-
-// battery voltage divider calibration
-// #define CONFIG_VBAT_ADC_DIVIDER (0.5)
-
-//
-// constants
-//
-
-// TODO
+#include "display.hpp"
 
 //
 // application state
 //
+static float state_battery_voltage = 0.0f;
 
 // battery
 static Battery battery;
@@ -28,53 +16,64 @@ static Battery battery;
 // display
 static Display display;
 
-void battery_init()
+void battery_tick()
 {
-  battery.begin(PIN_BAT_ADC);
-#ifdef CONFIG_VBAT_ADC_DIVIDER
-  battery.set_voltage_divider(CONFIG_VBAT_ADC_DIVIDER);
-#endif
+  battery.read();
+  state_battery_voltage = battery.get_voltage();
 }
 
-void battery_tick() {}
-
-void imu_init() {}
-
-void imu_tick() {}
-
-void display_init()
+void imu_tick()
 {
-  display.begin();
 }
 
 void display_tick()
 {
+  static auto c = false;
+
   display.startWrite();
 
-  display.fillCircle(120, 120, 30, TFT_GREEN);
+  if (!c)
+  {
+    display.fillCircle(120, 120, 30, TFT_RED);
+    display.fillCircle(120, 120, 20, TFT_GREEN);
+    display.fillCircle(120, 120, 10, TFT_BLUE);
+    c = true;
+  }
+
+  // voltage to string
+  char voltage_str[6];
+  sprintf(voltage_str, "%.2f V", state_battery_voltage);
+  display.drawCenterString(voltage_str, 120, 170);
 
   display.endWrite();
 }
 
 void setup()
 {
+  Serial.begin(115200);
+
   // initialize peripherals
-  battery_init();
-  imu_init();
-  display_init();
+  battery.begin(PIN_BAT_ADC);
+  display.begin(PIN_LCD_CLK,
+                PIN_LCD_MOSI,
+                -1,
+                PIN_LCD_DC,
+                PIN_LCD_CS,
+                PIN_LCD_RST,
+                PIN_LCD_BL);
 }
 
 void loop()
 {
+  // TODO: split these tick tasks on timers so they run via interrupts
+
   // 24hz maybe?
   display_tick();
-}
-
-void loop2()
-{
   // should update at its native polling rate
   imu_tick();
-
   // every second maybe?
   battery_tick();
+
+  // TODO: remove this
+  delay(500);
 }
