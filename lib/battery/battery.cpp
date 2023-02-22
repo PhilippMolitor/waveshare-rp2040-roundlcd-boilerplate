@@ -10,7 +10,7 @@ float Battery::mapf(float x, float in_min, float in_max, float out_min, float ou
       out_max);
 }
 
-void Battery::begin(uint8_t adc_pin)
+void Battery::begin(pin_size_t adc_pin)
 {
   m_adc_pin = adc_pin;
 }

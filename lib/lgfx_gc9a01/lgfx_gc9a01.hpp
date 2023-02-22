@@ -10,13 +10,13 @@ private:
 
 public:
   inline bool begin(
-      uint16_t pin_sclk,
-      uint16_t pin_mosi,
-      uint16_t pin_miso,
-      uint16_t pin_dc,
-      uint16_t pin_cs,
-      uint16_t pin_rst,
-      uint16_t pin_bl)
+      pin_size_t pin_sclk,
+      pin_size_t pin_mosi,
+      pin_size_t pin_miso,
+      pin_size_t pin_dc,
+      pin_size_t pin_cs,
+      pin_size_t pin_rst,
+      pin_size_t pin_bl)
   {
     // SPI bus config
     {
