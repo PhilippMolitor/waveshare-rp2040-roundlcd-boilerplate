@@ -1,4 +1,3 @@
 {
-  "editor.formatOnSave": true,
-  "cmake.sourceDirectory": "${workspaceFolder}/.pio/libdeps/debug/LovyanGFX"
+  "editor.formatOnSave": true
 }
