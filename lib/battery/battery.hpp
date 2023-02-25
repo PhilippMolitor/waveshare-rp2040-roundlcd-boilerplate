@@ -1,8 +1,7 @@
 #pragma once
 
-class Battery
-{
-private:
+class Battery {
+ private:
   pin_size_t m_adc_pin;
   unsigned int m_adc_value = 0;
 
@@ -11,7 +10,7 @@ private:
 
   float mapf(float x, float in_min, float in_max, float out_min, float out_max);
 
-public:
+ public:
   void begin(pin_size_t adc_pin);
 
   void set_voltage_ref(float voltage);
@@ -19,7 +18,8 @@ public:
 
   /// read out the ADC pin of the voltage sensor
   void read();
-  /// calculate the power source voltage in relation to the voltage reference, divided by the voltage divider
-  /// invoke `Battery::read()` beforehand so the value is up to date.
+  /// calculate the power source voltage in relation to the voltage reference,
+  /// divided by the voltage divider invoke `Battery::read()` beforehand so the
+  /// value is up to date.
   float get_voltage();
 };
