@@ -3,26 +3,6 @@
 
 #include "qmi8658c.hpp"
 
-QMI8658C::QMI8658C() {
-  m_wire = &Wire;
-  m_i2c_address = QMI8658C_I2C_ADDRESS_DEFAULT;
-}
-
-QMI8658C::QMI8658C(TwoWire* wire) {
-  m_wire = wire;
-  m_i2c_address = QMI8658C_I2C_ADDRESS_DEFAULT;
-}
-
-QMI8658C::QMI8658C(uint8_t device_address) {
-  m_wire = &Wire;
-  m_i2c_address = device_address;
-}
-
-QMI8658C::QMI8658C(TwoWire* wire, uint8_t device_address) {
-  m_wire = wire;
-  m_i2c_address = device_address;
-}
-
 bool QMI8658C::request_whoami() {
   m_device_id = 0;
   m_device_revision = 0;
@@ -73,6 +53,23 @@ uint8_t QMI8658C::i2c_read_block(uint8_t start_register,
 }
 
 bool QMI8658C::begin() {
+  return begin(&Wire, QMI8658C_I2C_ADDRESS_DEFAULT);
+}
+
+bool QMI8658C::begin(TwoWire* wire) {
+  m_wire = wire;
+  return begin(QMI8658C_I2C_ADDRESS_DEFAULT);
+}
+
+bool QMI8658C::begin(uint8_t device_address) {
+  m_i2c_address = device_address;
+  return begin(&Wire);
+}
+
+bool QMI8658C::begin(TwoWire* wire, uint8_t device_address) {
+  m_wire = wire;
+  m_i2c_address = device_address;
+
   // wait for device to reply with device id
   auto success = false;
   uint8_t whoami_tries = 0;

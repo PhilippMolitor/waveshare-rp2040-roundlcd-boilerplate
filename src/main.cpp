@@ -19,7 +19,7 @@ static float state_imu_gyro[3] = {0.0f, 0.0f, 0.0f};
 // battery
 static Battery battery;
 // imu
-static QMI8658C imu(&Wire1, QMI8658C_I2C_ADDRESS_PULLUP);
+static QMI8658C imu;
 // display
 static LGFX_GC9A01 display;
 
@@ -77,7 +77,7 @@ void setup() {
   Wire1.setSCL(PIN_IMU_SCL);
   Wire1.setClock(400'000);
   Wire1.begin();
-  state_imu_initialized = imu.begin();
+  state_imu_initialized = imu.begin(&Wire1, QMI8658C_I2C_ADDRESS_PULLUP);
   if (state_imu_initialized) {
     imu.configure_acc(QMI8658C::AccScale::ACC_SCALE_4G,
                       QMI8658C::AccODR::ACC_ODR_250HZ,

@@ -234,12 +234,10 @@ class QMI8658C {
     GYRO_LPF_DISABLED = 0b1111'1111,
   };
 
-  QMI8658C();
-  QMI8658C(TwoWire* wire);
-  QMI8658C(uint8_t device_address);
-  QMI8658C(TwoWire* wire, uint8_t device_address);
-
   bool begin();
+  bool begin(TwoWire* wire);
+  bool begin(uint8_t device_address);
+  bool begin(TwoWire* wire, uint8_t device_address);
   bool device_info(uint8_t* device_id, uint8_t* device_revision);
 
   // void calibrate();
