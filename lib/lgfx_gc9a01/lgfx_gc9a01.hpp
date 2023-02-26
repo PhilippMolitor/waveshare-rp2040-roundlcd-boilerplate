@@ -1,4 +1,5 @@
-#include <Arduino.h>
+#pragma once
+
 #include <LovyanGFX.h>
 
 class LGFX_GC9A01 : public lgfx::LGFX_Device {
