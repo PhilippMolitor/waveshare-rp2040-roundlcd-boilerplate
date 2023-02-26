@@ -11,7 +11,6 @@ class LGFX_GC9A01 : public lgfx::LGFX_Device {
  public:
   inline bool begin(int16_t pin_sclk,
                     int16_t pin_mosi,
-                    int16_t pin_miso,
                     int16_t pin_dc,
                     int16_t pin_cs,
                     int16_t pin_rst,
@@ -26,7 +25,7 @@ class LGFX_GC9A01 : public lgfx::LGFX_Device {
       cfg.freq_read = 16000000;
       cfg.pin_sclk = pin_sclk;
       cfg.pin_mosi = pin_mosi;
-      cfg.pin_miso = pin_miso;
+      cfg.pin_miso = -1;
       cfg.pin_dc = pin_dc;
 
       _bus_instance.config(cfg);

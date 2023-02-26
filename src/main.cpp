@@ -90,8 +90,8 @@ void setup() {
   }
 
   // initialize display
-  display.begin(PIN_LCD_CLK, PIN_LCD_MOSI, -1, PIN_LCD_DC, PIN_LCD_CS,
-                PIN_LCD_RST, PIN_LCD_BL);
+  display.begin(PIN_LCD_CLK, PIN_LCD_MOSI, PIN_LCD_DC, PIN_LCD_CS, PIN_LCD_RST,
+                PIN_LCD_BL);
 }
 
 void loop() {
