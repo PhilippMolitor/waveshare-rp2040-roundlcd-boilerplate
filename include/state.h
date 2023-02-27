@@ -16,6 +16,7 @@ typedef struct imu_data_t {
 
 typedef struct battery_data_t {
   float voltage;
+  float percentage;
 } battery_data_t;
 
 typedef struct state_t {

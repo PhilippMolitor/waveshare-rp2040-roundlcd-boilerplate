@@ -22,6 +22,7 @@ state_t state = {
     .battery =
         {
             .voltage = 0.0f,
+            .percentage = 0.0f,
         },
 };
 
@@ -35,6 +36,7 @@ static LGFX_GC9A01 display;
 void battery_tick() {
   battery.update();
   battery.voltage(&state.battery.voltage);
+  battery.percentage(&state.battery.percentage);
 }
 
 void imu_tick() {
@@ -50,9 +52,13 @@ void display_tick() {
   display.startWrite();
 
   // voltage
-  char voltage_str[10];
-  sprintf(voltage_str, "Bat: %.2f V", state.battery.voltage);
-  display.drawRightString(voltage_str, 228, 70);
+  char bat_v_str[10];
+  char bat_ptc_str[10];
+  int8_t bat_ptc = round(state.battery.percentage * 100);
+  sprintf(bat_v_str, "Bat: %.2f V", state.battery.voltage);
+  sprintf(bat_ptc_str, "%d %%", bat_ptc);
+  display.drawRightString(bat_v_str, 228, 70);
+  display.drawRightString(bat_ptc_str, 228, 80);
 
   // IMU temp
   char imu_temp_str[20];
