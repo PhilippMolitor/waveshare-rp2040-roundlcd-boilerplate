@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Arduino.h>
+
 class Battery {
  private:
   pin_size_t m_adc_pin;
@@ -17,9 +19,9 @@ class Battery {
   void set_voltage_divider(float divisor);
 
   /// read out the ADC pin of the voltage sensor
-  void read();
+  void update();
   /// calculate the power source voltage in relation to the voltage reference,
   /// divided by the voltage divider invoke `Battery::read()` beforehand so the
   /// value is up to date.
-  float get_voltage();
+  void voltage(float* value);
 };

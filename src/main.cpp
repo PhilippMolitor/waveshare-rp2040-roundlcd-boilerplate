@@ -33,8 +33,8 @@ static QMI8658C imu;
 static LGFX_GC9A01 display;
 
 void battery_tick() {
-  battery.read();
-  state.battery.voltage = battery.get_voltage();
+  battery.update();
+  battery.voltage(&state.battery.voltage);
 }
 
 void imu_tick() {

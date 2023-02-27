@@ -26,13 +26,13 @@ void Battery::set_voltage_divider(float divisor) {
   m_voltage_divider = divisor;
 }
 
-void Battery::read() {
+void Battery::update() {
   analogReadResolution(12);
   m_adc_value = analogRead(m_adc_pin);
 }
 
-float Battery::get_voltage() {
+void Battery::voltage(float* value) {
   // map adc value to voltage by reference and divide by voltage divider
-  return mapf(m_adc_value, 0.0f, 4095.0f, 0.0f, m_voltage_ref) /
-         m_voltage_divider;
+  *value =
+      mapf(m_adc_value, 0.0f, 4095.0f, 0.0f, m_voltage_ref) / m_voltage_divider;
 }
