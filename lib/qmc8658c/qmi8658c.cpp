@@ -52,6 +52,15 @@ uint8_t QMI8658C::i2c_read_block(uint8_t start_register,
   return read;
 }
 
+uint16_t QMI8658C::float_to_fixed(float value,
+                                  uint8_t int_bits,
+                                  uint8_t fraction_bits) {
+  int16_t integer_part = static_cast<int16_t>(value);
+  int16_t fraction_part =
+      static_cast<int16_t>((value - integer_part) * (1 << fraction_bits));
+  return (integer_part << fraction_bits) + fraction_part;
+}
+
 bool QMI8658C::begin() {
   return begin(&Wire, QMI8658C_I2C_ADDRESS_DEFAULT);
 }

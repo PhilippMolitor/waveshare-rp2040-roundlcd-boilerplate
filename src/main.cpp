@@ -81,10 +81,10 @@ void setup() {
   if (state_imu_initialized) {
     imu.configure_acc(QMI8658C::AccScale::ACC_SCALE_4G,
                       QMI8658C::AccODR::ACC_ODR_250HZ,
-                      QMI8658C::AccLPF::ACC_LPF_5_32_PERC);
+                      QMI8658C::AccLPF::ACC_LPF_5_32PCT);
     imu.configure_gyro(QMI8658C::GyroScale::GYRO_SCALE_512DPS,
                        QMI8658C::GyroODR::GYRO_ODR_250HZ,
-                       QMI8658C::GyroLPF::GYRO_LPF_5_32_PERC);
+                       QMI8658C::GyroLPF::GYRO_LPF_5_32PCT);
     attachInterrupt(digitalPinToInterrupt(PIN_IMU_INT_2), imu_tick,
                     PinStatus::RISING);
   }

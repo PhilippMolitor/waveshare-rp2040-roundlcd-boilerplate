@@ -103,7 +103,6 @@ class QMI8658C {
 
   uint8_t m_device_id;
   uint8_t m_device_revision;
-
   float m_accelerometer_lsb_sensitivity;
   float m_gyroscope_lsb_sensitivity;
 
@@ -112,6 +111,7 @@ class QMI8658C {
   uint8_t i2c_read_block(uint8_t start_register,
                          uint8_t length,
                          uint8_t* buffer);
+  uint16_t float_to_fixed(float value, uint8_t int_bits, uint8_t fraction_bits);
 
  public:
   /// Gyroscope scale in dps (degrees per second)
@@ -167,13 +167,13 @@ class QMI8658C {
   /// Accelerometer low pass filter
   enum class AccLPF : uint8_t {
     /// Bandwidth: 2.62% of ODR
-    ACC_LPF_2_62_PERC = 0b00,
+    ACC_LPF_2_62PCT = 0b00,
     /// Bandwidth: 2.62% of ODR
-    ACC_LPF_3_59_PERC = 0b01,
+    ACC_LPF_3_59PCT = 0b01,
     /// Bandwidth: 2.62% of ODR
-    ACC_LPF_5_32_PERC = 0b10,
+    ACC_LPF_5_32PCT = 0b10,
     /// Bandwidth: 2.62% of ODR
-    ACC_LPF_14_PERC = 0b11,
+    ACC_LPF_14PCT = 0b11,
     /// Disables the accelerometer low-pass filter
     ACC_LPF_DISABLED = 0b1111'1111,
   };
@@ -223,13 +223,13 @@ class QMI8658C {
   /// Gyroscope low pass filter
   enum class GyroLPF : uint8_t {
     /// Bandwidth: 2.62% of ODR
-    GYRO_LPF_2_62_PERC = 0b00,
+    GYRO_LPF_2_62PCT = 0b00,
     /// Bandwidth: 2.62% of ODR
-    GYRO_LPF_3_59_PERC = 0b01,
+    GYRO_LPF_3_59PCT = 0b01,
     /// Bandwidth: 2.62% of ODR
-    GYRO_LPF_5_32_PERC = 0b10,
+    GYRO_LPF_5_32PCT = 0b10,
     /// Bandwidth: 2.62% of ODR
-    GYRO_LPF_14_PERC = 0b11,
+    GYRO_LPF_14PCT = 0b11,
     /// Disables the gyroscope low-pass filter
     GYRO_LPF_DISABLED = 0b1111'1111,
   };
