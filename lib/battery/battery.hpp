@@ -31,8 +31,12 @@ class Battery {
   /// read out the ADC pin of the voltage sensor
   void update();
   /// calculate the power source voltage in relation to the voltage reference,
-  /// divided by the voltage divider invoke `Battery::read()` beforehand so the
-  /// value is up to date.
+  /// divided by the voltage divider.
+  /// invoke `Battery::read()` beforehand so the value is up to date.
   void voltage(float* value);
+  /// calculate the battery capacity percentage based on the percentage
+  /// calculator. the default profile estimates a LiPo battery under very low
+  /// amp draw.
+  /// invoke `Battery::read()` beforehand so the value is up to date.
   void percentage(float* value);
 };
