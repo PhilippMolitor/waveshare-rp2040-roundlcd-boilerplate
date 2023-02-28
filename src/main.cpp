@@ -26,29 +26,26 @@ state_t state = {
         },
 };
 
-// battery
 static Battery battery;
-// imu
 static QMI8658C imu;
-// display
 static LGFX_GC9A01 display;
 
-void battery_tick() {
+void batteryTick() {
   battery.update();
   battery.voltage(&state.battery.voltage);
   battery.percentage(&state.battery.percentage);
 }
 
-void imu_tick() {
+void imuTick() {
   if (!state.imu.ready)
     return;
 
-  imu.read_temperature(&state.imu.temp);
-  imu.read_accelerometer(&state.imu.acc.x, &state.imu.acc.y, &state.imu.acc.z);
-  imu.read_gyroscope(&state.imu.gyro.x, &state.imu.gyro.y, &state.imu.gyro.z);
+  imu.readTemperature(&state.imu.temp);
+  imu.readAccelerometer(&state.imu.acc.x, &state.imu.acc.y, &state.imu.acc.z);
+  imu.readGyroscope(&state.imu.gyro.x, &state.imu.gyro.y, &state.imu.gyro.z);
 }
 
-void display_tick() {
+void displayTick() {
   display.startWrite();
 
   // voltage
@@ -87,36 +84,43 @@ void setup() {
   Serial.begin(115200);
 
   // initialize battery adc
-  battery.begin(PIN_BAT_ADC);
+  { battery.begin(PIN_BAT_ADC); }
+
   // initialize IMU
-  Wire1.setSDA(PIN_IMU_SDA);
-  Wire1.setSCL(PIN_IMU_SCL);
-  Wire1.setClock(400'000);
-  Wire1.begin();
-  state.imu.ready = imu.begin(&Wire1, QMI8658C_I2C_ADDRESS_PULLUP);
-  if (state.imu.ready) {
-    imu.configure_acc(QMI8658C::AccScale::ACC_SCALE_4G,
-                      QMI8658C::AccODR::ACC_ODR_250HZ,
-                      QMI8658C::AccLPF::ACC_LPF_5_32PCT);
-    imu.configure_gyro(QMI8658C::GyroScale::GYRO_SCALE_512DPS,
-                       QMI8658C::GyroODR::GYRO_ODR_250HZ,
-                       QMI8658C::GyroLPF::GYRO_LPF_5_32PCT);
-    attachInterrupt(digitalPinToInterrupt(PIN_IMU_INT_2), imu_tick,
-                    PinStatus::RISING);
+  {
+    // set up I2C1
+    Wire1.setSDA(PIN_IMU_SDA);
+    Wire1.setSCL(PIN_IMU_SCL);
+    Wire1.setClock(400'000);
+    Wire1.begin();
+    // set up IMU driver
+    state.imu.ready = imu.begin(&Wire1, QMI8658C_I2C_ADDRESS_PULLUP);
+    if (state.imu.ready) {
+      imu.configureAcc(QMI8658C::AccScale::ACC_SCALE_4G,
+                       QMI8658C::AccODR::ACC_ODR_250HZ,
+                       QMI8658C::AccLPF::ACC_LPF_5_32PCT);
+      imu.configureGyro(QMI8658C::GyroScale::GYRO_SCALE_512DPS,
+                        QMI8658C::GyroODR::GYRO_ODR_250HZ,
+                        QMI8658C::GyroLPF::GYRO_LPF_5_32PCT);
+      attachInterrupt(digitalPinToInterrupt(PIN_IMU_INT_2), imuTick,
+                      PinStatus::RISING);
+    }
   }
 
   // initialize display
-  display.begin(PIN_LCD_CLK, PIN_LCD_MOSI, PIN_LCD_DC, PIN_LCD_CS, PIN_LCD_RST,
-                PIN_LCD_BL);
+  {
+    display.begin(PIN_LCD_CLK, PIN_LCD_MOSI, PIN_LCD_DC, PIN_LCD_CS,
+                  PIN_LCD_RST, PIN_LCD_BL);
+  }
 }
 
 void loop() {
   // TODO: split these tick tasks on timers so they run via interrupts
 
   // 24hz maybe?
-  display_tick();
+  displayTick();
   // every second maybe?
-  battery_tick();
+  batteryTick();
 
   // TODO: remove this
   delay(1000 / 24);

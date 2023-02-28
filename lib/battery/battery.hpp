@@ -10,12 +10,12 @@ typedef std::function<float(float voltage)> battery_percentage_lambda_t;
 
 class Battery {
  private:
-  pin_size_t m_adc_pin;
-  unsigned int m_adc_value = 0;
+  pin_size_t m_adcPin;
+  unsigned int m_adcValue = 0;
 
-  float m_voltage_ref = 3.30f;
-  float m_voltage_divider = 0.5;
-  battery_percentage_lambda_t m_percentage_lambda;
+  float m_voltageRef = 3.30f;
+  float m_voltageDivider = 0.5;
+  battery_percentage_lambda_t m_percentageLambda;
 
   float mapf(float x, float in_min, float in_max, float out_min, float out_max);
 
@@ -24,9 +24,9 @@ class Battery {
 
   void begin(pin_size_t adc_pin);
 
-  void set_voltage_ref(float voltage);
-  void set_voltage_divider(float divisor);
-  void set_percentage_calculator(battery_percentage_lambda_t calculator);
+  void setVoltageRef(float voltage);
+  void setVoltageDivider(float divisor);
+  void setPercentageCalculator(battery_percentage_lambda_t calculator);
 
   /// read out the ADC pin of the voltage sensor
   void update();

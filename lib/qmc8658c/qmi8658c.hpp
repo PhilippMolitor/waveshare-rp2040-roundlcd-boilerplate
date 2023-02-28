@@ -99,19 +99,19 @@
 class QMI8658C {
  private:
   TwoWire* m_wire;
-  uint8_t m_i2c_address;
+  uint8_t m_i2cAddress;
 
-  uint8_t m_device_id;
-  uint8_t m_device_revision;
-  float m_accelerometer_lsb_sensitivity;
-  float m_gyroscope_lsb_sensitivity;
+  uint8_t m_deviceId;
+  uint8_t m_deviceRevision;
+  float m_accelerometerLsbSensitivity;
+  float m_gyroscopeLsbSensitivity;
 
-  bool request_whoami();
-  bool i2c_read_u16(uint8_t register_l, uint8_t register_h, uint16_t* buffer);
-  uint8_t i2c_read_block(uint8_t start_register,
-                         uint8_t length,
-                         uint8_t* buffer);
-  uint16_t float_to_fixed(float value, uint8_t int_bits, uint8_t fraction_bits);
+  bool detectDevice();
+  bool i2cReadU16(uint8_t register_l, uint8_t register_h, uint16_t* buffer);
+  uint8_t i2cReadRegisterBlock(uint8_t start_register,
+                               uint8_t length,
+                               uint8_t* buffer);
+  uint16_t floatToFixed(float value, uint8_t int_bits, uint8_t fraction_bits);
 
  public:
   /// Gyroscope scale in dps (degrees per second)
@@ -238,35 +238,35 @@ class QMI8658C {
   bool begin(TwoWire* wire);
   bool begin(uint8_t device_address);
   bool begin(TwoWire* wire, uint8_t device_address);
-  bool device_info(uint8_t* device_id, uint8_t* device_revision);
+  bool deviceInfo(uint8_t* device_id, uint8_t* device_revision);
 
   // void calibrate();
   // void calibrate(int samples);
   void enable(bool enable_gyro, bool enable_acc);
-  void configure_hs_clock(bool enable);
-  void configure_acc();
-  void configure_acc(AccScale scale);
-  void configure_acc(AccScale scale, AccODR odr);
-  void configure_acc(AccScale scale, AccODR odr, AccLPF lpf);
-  void configure_gyro();
-  void configure_gyro(GyroScale scale);
-  void configure_gyro(GyroScale scale, GyroODR odr);
-  void configure_gyro(GyroScale scale, GyroODR odr, GyroLPF lpf);
+  void configureHsClock(bool enable);
+  void configureAcc();
+  void configureAcc(AccScale scale);
+  void configureAcc(AccScale scale, AccODR odr);
+  void configureAcc(AccScale scale, AccODR odr, AccLPF lpf);
+  void configureGyro();
+  void configureGyro(GyroScale scale);
+  void configureGyro(GyroScale scale, GyroODR odr);
+  void configureGyro(GyroScale scale, GyroODR odr, GyroLPF lpf);
 
   /// @brief reads out the internal temperature sensor
   /// @param degrees
   /// @return `true` if the read operation was successful
-  bool read_temperature(float* degrees);
+  bool readTemperature(float* degrees);
   /// @brief reads the current accelerometer values
   /// @param ax x-axis value in g
   /// @param ay y-axis value in g
   /// @param az z-axis value in g
   /// @return `true` on success, `false` if the read operation failed
-  bool read_accelerometer(float* ax, float* ay, float* az);
+  bool readAccelerometer(float* ax, float* ay, float* az);
   /// @brief reads out the current gyroscope values
   /// @param gx x-axis rotation in dps (degrees per second)
   /// @param gy y-axis rotation in dps (degrees per second)
   /// @param gz z-axis rotation in dps (degrees per second)
   /// @return `true` on success, `false` if the read operation failed
-  bool read_gyroscope(float* gx, float* gy, float* gz);
+  bool readGyroscope(float* gx, float* gy, float* gz);
 };
