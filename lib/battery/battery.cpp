@@ -2,16 +2,6 @@
 
 #include "battery.hpp"
 
-float Battery::mapf(float x,
-                    float in_min,
-                    float in_max,
-                    float out_min,
-                    float out_max) {
-  return constrain(
-      (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min, out_min,
-      out_max);
-}
-
 Battery::Battery() {
   m_percentageLambda = BATTERY_LAMBDA_PERCENTAGE_LIPO;
 }

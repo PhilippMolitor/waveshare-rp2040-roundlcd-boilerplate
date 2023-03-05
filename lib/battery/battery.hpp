@@ -3,8 +3,20 @@
 #include <Arduino.h>
 #include <functional>
 
-#define BATTERY_LAMBDA_PERCENTAGE_LIPO [](float v) { return v / 5; }
-#define BATTERY_LAMBDA_PERCENTAGE_LIION [](float v) { return v / 5; }
+inline float mapf(float x,
+                  float in_min,
+                  float in_max,
+                  float out_min,
+                  float out_max) {
+  return constrain(
+      (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min, out_min,
+      out_max);
+}
+
+#define BATTERY_LAMBDA_PERCENTAGE_LIPO \
+  [](float v) { return mapf(v, 3.5f, 4.2f, 0.0f, 1.0f); }
+#define BATTERY_LAMBDA_PERCENTAGE_LIION \
+  [](float v) { return mapf(v, 3.0f, 4.2f, 0.0f, 1.0f); }
 
 typedef std::function<float(float voltage)> battery_percentage_lambda_t;
 
@@ -16,8 +28,6 @@ class Battery {
   float m_voltageRef = 3.30f;
   float m_voltageDivider = 0.5;
   battery_percentage_lambda_t m_percentageLambda;
-
-  float mapf(float x, float in_min, float in_max, float out_min, float out_max);
 
  public:
   Battery();
