@@ -5,7 +5,6 @@
 #include <qmi8658c.hpp>
 
 // project-provided includes
-#include "pinout.h"
 #include "state.h"
 
 #include "battery.hpp"
@@ -105,14 +104,14 @@ void setup() {
       imu.configureGyro(QMI8658C::GyroScale::GYRO_SCALE_512DPS,
                         QMI8658C::GyroODR::GYRO_ODR_250HZ,
                         QMI8658C::GyroLPF::GYRO_LPF_5_32PCT);
-      attachInterrupt(digitalPinToInterrupt(PIN_IMU_INT_2), imuTick,
+      attachInterrupt(digitalPinToInterrupt(PIN_IMU_INT2), imuTick,
                       PinStatus::RISING);
     }
   }
 
   // initialize display
   {
-    display.begin(PIN_LCD_CLK, PIN_LCD_MOSI, PIN_LCD_DC, PIN_LCD_CS,
+    display.begin(PIN_LCD_SCLK, PIN_LCD_MOSI, PIN_LCD_DC, PIN_LCD_CS,
                   PIN_LCD_RST, PIN_LCD_BL);
   }
 }
