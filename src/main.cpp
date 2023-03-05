@@ -1,12 +1,15 @@
 #include <Arduino.h>
 #include <Wire.h>
 
+// project-provided libs
+#include <qmi8658c.hpp>
+
+// project-provided includes
 #include "pinout.h"
 #include "state.h"
 
 #include "battery.hpp"
 #include "lgfx_gc9a01.hpp"
-#include "qmi8658c.hpp"
 
 //
 // application state
