@@ -12,6 +12,13 @@
 #include "lgfx_gc9a01.hpp"
 
 //
+// application config
+//
+
+#define CONFIG_DISPLAY_UPDATE_RATE_HZ (24u)
+#define CONFIG_BATTERY_UPDATE_RATE_HZ (2u)
+
+//
 // application state
 //
 state_t state = {
@@ -124,18 +131,18 @@ void setup() {
 
   // attach timer callbacks for regular peripheral updates
   {
-    // display at 24hz
+    // display
     add_repeating_timer_ms(
-        1000 / 24,
+        1000 / CONFIG_DISPLAY_UPDATE_RATE_HZ,
         [](struct repeating_timer* t) {
           displayTick();
           return true;
         },
         NULL, &timerDisplay);
 
-    // battery monitor at 2hz
+    // battery monitor
     add_repeating_timer_ms(
-        1000 / 2,
+        1000 / CONFIG_DISPLAY_UPDATE_RATE_HZ,
         [](struct repeating_timer* t) {
           batteryTick();
           return true;
