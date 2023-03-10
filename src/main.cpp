@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>
+#include <pico/stdlib.h>
 
 // project-provided libs
 #include <qmi8658c.hpp>
@@ -31,6 +32,9 @@ state_t state = {
 static Battery battery;
 static QMI8658C imu;
 static LGFX_GC9A01 display;
+
+struct repeating_timer timerDisplay;
+struct repeating_timer timerBattery;
 
 void batteryTick() {
   battery.update();
@@ -86,7 +90,10 @@ void setup() {
   Serial.begin(115200);
 
   // initialize battery adc
-  { battery.begin(PIN_BAT_ADC); }
+  {
+    // TODO: PIN_BAT_ADC from the PlatformIO target def is 25, should be 29
+    battery.begin(29);
+  }
 
   // initialize IMU
   {
@@ -114,16 +121,29 @@ void setup() {
     display.begin(PIN_LCD_SCLK, PIN_LCD_MOSI, PIN_LCD_DC, PIN_LCD_CS,
                   PIN_LCD_RST, PIN_LCD_BL);
   }
+
+  // attach timer callbacks for regular peripheral updates
+  {
+    // display at 24hz
+    add_repeating_timer_ms(
+        1000 / 24,
+        [](struct repeating_timer* t) {
+          displayTick();
+          return true;
+        },
+        NULL, &timerDisplay);
+
+    // battery monitor at 2hz
+    add_repeating_timer_ms(
+        1000 / 2,
+        [](struct repeating_timer* t) {
+          batteryTick();
+          return true;
+        },
+        NULL, &timerBattery);
+  }
 }
 
 void loop() {
-  // TODO: split these tick tasks on timers so they run via interrupts
-
-  // 24hz maybe?
-  displayTick();
-  // every second maybe?
-  batteryTick();
-
-  // TODO: remove this
-  delay(1000 / 24);
+  delay(100);
 }
