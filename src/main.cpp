@@ -133,7 +133,7 @@ void setup() {
   {
     // display
     add_repeating_timer_ms(
-        1000 / CONFIG_DISPLAY_UPDATE_RATE_HZ,
+        -(1000 / CONFIG_DISPLAY_UPDATE_RATE_HZ),
         [](struct repeating_timer* t) {
           displayTick();
           return true;
@@ -142,7 +142,7 @@ void setup() {
 
     // battery monitor
     add_repeating_timer_ms(
-        1000 / CONFIG_DISPLAY_UPDATE_RATE_HZ,
+        -(1000 / CONFIG_DISPLAY_UPDATE_RATE_HZ),
         [](struct repeating_timer* t) {
           batteryTick();
           return true;
