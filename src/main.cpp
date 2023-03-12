@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>
+#include <pico/mutex.h>
 #include <pico/stdlib.h>
 
 // project-provided libs
@@ -8,20 +9,23 @@
 // project-provided includes
 #include "state.h"
 
+// project source
 #include "battery.hpp"
 #include "lgfx_gc9a01.hpp"
 
 //
 // application config
 //
-
 #define CONFIG_DISPLAY_UPDATE_RATE_HZ (24u)
 #define CONFIG_BATTERY_UPDATE_RATE_HZ (2u)
 
 //
 // application state
 //
+mutex stateMtx;
+
 state_t state = {
+    .counter = 0,
     .imu =
         {
             .ready = false,
@@ -40,67 +44,81 @@ static Battery battery;
 static QMI8658C imu;
 static LGFX_GC9A01 display;
 
-struct repeating_timer timerDisplay;
-struct repeating_timer timerBattery;
+repeating_timer timerDisplay;
+repeating_timer timerBattery;
 
 void batteryTick() {
   battery.update();
-  battery.voltage(&state.battery.voltage);
-  battery.percentage(&state.battery.percentage);
+
+  mutex_enter_blocking(&stateMtx);
+  {
+    battery.voltage(&state.battery.voltage);
+    battery.percentage(&state.battery.percentage);
+  }
+  mutex_exit(&stateMtx);
 }
 
 void imuTick() {
   if (!state.imu.ready)
     return;
 
-  imu.readTemperature(&state.imu.temp);
-  imu.readAccelerometer(&state.imu.acc.x, &state.imu.acc.y, &state.imu.acc.z);
-  imu.readGyroscope(&state.imu.gyro.x, &state.imu.gyro.y, &state.imu.gyro.z);
+  mutex_enter_blocking(&stateMtx);
+  {
+    imu.readTemperature(&state.imu.temp);
+    imu.readAccelerometer(&state.imu.acc.x, &state.imu.acc.y, &state.imu.acc.z);
+    imu.readGyroscope(&state.imu.gyro.x, &state.imu.gyro.y, &state.imu.gyro.z);
+  }
+  mutex_exit(&stateMtx);
 }
 
 void displayTick() {
-  display.startWrite();
-
-  // voltage
+  char counter_str[16];
   char bat_v_str[10];
-  char bat_ptc_str[10];
-  int8_t bat_ptc = round(state.battery.percentage * 100);
-  sprintf(bat_v_str, "Bat: %.2f V", state.battery.voltage);
-  sprintf(bat_ptc_str, "%d %%", bat_ptc);
-  display.drawRightString(bat_v_str, 228, 70);
-  display.drawRightString(bat_ptc_str, 228, 80);
-
-  // IMU temp
+  char bat_pct_str[10];
   char imu_temp_str[20];
-  sprintf(imu_temp_str, "IMU temp: %.2f C", state.imu.temp);
-  display.drawString(imu_temp_str, 12, 70);
-  // IMU data
   char imu_ax_str[18], imu_ay_str[18], imu_az_str[18];
   char imu_gx_str[21], imu_gy_str[21], imu_gz_str[21];
-  sprintf(imu_ax_str, "ax: %.2f g", state.imu.acc.x);
-  sprintf(imu_ay_str, "ay: %.2f g", state.imu.acc.y);
-  sprintf(imu_az_str, "az: %.2f g", state.imu.acc.z);
-  sprintf(imu_gx_str, "gx: %.2f dps", state.imu.gyro.x);
-  sprintf(imu_gy_str, "gy: %.2f dps", state.imu.gyro.y);
-  sprintf(imu_gz_str, "gz: %.2f dps", state.imu.gyro.z);
-  display.drawString(imu_ax_str, 12, 90);
-  display.drawString(imu_ay_str, 12, 100);
-  display.drawString(imu_az_str, 12, 110);
-  display.drawString(imu_gx_str, 12, 120);
-  display.drawString(imu_gy_str, 12, 130);
-  display.drawString(imu_gz_str, 12, 140);
 
+  mutex_enter_blocking(&stateMtx);
+  {
+    sprintf(counter_str, "count: %d", state.counter);
+    sprintf(bat_v_str, "Bat: %.2f V", state.battery.voltage);
+    sprintf(bat_pct_str, "%d %%", round(state.battery.percentage * 100));
+    sprintf(imu_temp_str, "IMU temp: %.2f C", state.imu.temp);
+    sprintf(imu_ax_str, "ax: %.2f g", state.imu.acc.x);
+    sprintf(imu_ay_str, "ay: %.2f g", state.imu.acc.y);
+    sprintf(imu_az_str, "az: %.2f g", state.imu.acc.z);
+    sprintf(imu_gx_str, "gx: %.2f dps", state.imu.gyro.x);
+    sprintf(imu_gy_str, "gy: %.2f dps", state.imu.gyro.y);
+    sprintf(imu_gz_str, "gz: %.2f dps", state.imu.gyro.z);
+  }
+  mutex_exit(&stateMtx);
+
+  // drawing
+  display.startWrite();
+  {
+    display.drawRightString(counter_str, 228, 140);
+    display.drawRightString(bat_v_str, 228, 70);
+    display.drawRightString(bat_pct_str, 228, 80);
+    display.drawString(imu_temp_str, 12, 70);
+    display.drawString(imu_ax_str, 12, 90);
+    display.drawString(imu_ay_str, 12, 100);
+    display.drawString(imu_az_str, 12, 110);
+    display.drawString(imu_gx_str, 12, 120);
+    display.drawString(imu_gy_str, 12, 130);
+    display.drawString(imu_gz_str, 12, 140);
+  }
   display.endWrite();
 }
 
 void setup() {
   Serial.begin(115200);
 
+  // set up state access mutex
+  mutex_init(&stateMtx);
+
   // initialize battery adc
-  {
-    // TODO: PIN_BAT_ADC from the PlatformIO target def is 25, should be 29
-    battery.begin(29);
-  }
+  { battery.begin(PIN_BAT_ADC); }
 
   // initialize IMU
   {
@@ -109,6 +127,7 @@ void setup() {
     Wire1.setSCL(PIN_IMU_SCL);
     Wire1.setClock(400'000);
     Wire1.begin();
+
     // set up IMU driver
     state.imu.ready = imu.begin(&Wire1, QMI8658C_I2C_ADDRESS_PULLUP);
     if (state.imu.ready) {
@@ -152,5 +171,19 @@ void setup() {
 }
 
 void loop() {
-  delay(100);
+  // run code on processor core 0
+  delay(1000);
+
+  mutex_enter_blocking(&stateMtx);
+  state.counter += 1;
+  mutex_exit(&stateMtx);
+}
+
+void loop1() {
+  // run code on processor core 1
+  delay(2000);
+
+  mutex_enter_blocking(&stateMtx);
+  state.counter += 2;
+  mutex_exit(&stateMtx);
 }
