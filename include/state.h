@@ -20,6 +20,7 @@ typedef struct battery_data_t {
 } battery_data_t;
 
 typedef struct state_t {
+  uint32_t counter;
   imu_data_t imu;
   battery_data_t battery;
 } state_t;
