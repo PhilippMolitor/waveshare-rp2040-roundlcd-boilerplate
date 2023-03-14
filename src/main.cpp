@@ -83,7 +83,8 @@ void displayTick() {
   {
     sprintf(counter_str, "count: %d", state.counter);
     sprintf(bat_v_str, "Bat: %.2f V", state.battery.voltage);
-    sprintf(bat_pct_str, "%d %%", round(state.battery.percentage * 100));
+    auto bat_pct = state.battery.percentage * 100;
+    sprintf(bat_pct_str, "%.0f %%", bat_pct);
     sprintf(imu_temp_str, "IMU temp: %.2f C", state.imu.temp);
     sprintf(imu_ax_str, "ax: %.2f g", state.imu.acc.x);
     sprintf(imu_ay_str, "ay: %.2f g", state.imu.acc.y);
