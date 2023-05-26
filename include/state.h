@@ -1,5 +1,17 @@
 #pragma once
 
+#include <Arduino.h>
+#include <pico/mutex.h>
+
+#define SAFE_STATE_UPDATE(mtx, statements) \
+  {                                        \
+    noInterrupts();                        \
+    mutex_enter_blocking(mtx);             \
+    statements;                            \
+    mutex_exit(mtx);                       \
+    interrupts();                          \
+  }
+
 template <class T>
 struct vec3_t {
   T x;

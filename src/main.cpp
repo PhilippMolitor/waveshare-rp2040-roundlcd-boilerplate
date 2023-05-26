@@ -24,7 +24,7 @@
 //
 mutex stateMtx;
 
-state_t state = {
+volatile state_t state = {
     .counter = 0,
     .imu =
         {
@@ -50,25 +50,22 @@ repeating_timer timerBattery;
 void batteryTick() {
   battery.update();
 
-  mutex_enter_blocking(&stateMtx);
-  {
-    battery.voltage(&state.battery.voltage);
-    battery.percentage(&state.battery.percentage);
-  }
-  mutex_exit(&stateMtx);
+  SAFE_STATE_UPDATE(&stateMtx, {
+    battery.voltage((float*)&state.battery.voltage);
+    battery.percentage((float*)&state.battery.percentage);
+  });
 }
 
 void imuTick() {
-  if (!state.imu.ready)
-    return;
-
-  mutex_enter_blocking(&stateMtx);
-  {
-    imu.readTemperature(&state.imu.temp);
-    imu.readAccelerometer(&state.imu.acc.x, &state.imu.acc.y, &state.imu.acc.z);
-    imu.readGyroscope(&state.imu.gyro.x, &state.imu.gyro.y, &state.imu.gyro.z);
-  }
-  mutex_exit(&stateMtx);
+  SAFE_STATE_UPDATE(&stateMtx, {
+    if (state.imu.ready) {
+      imu.readTemperature((float*)&state.imu.temp);
+      imu.readAccelerometer((float*)&state.imu.acc.x, (float*)&state.imu.acc.y,
+                            (float*)&state.imu.acc.z);
+      imu.readGyroscope((float*)&state.imu.gyro.x, (float*)&state.imu.gyro.y,
+                        (float*)&state.imu.gyro.z);
+    }
+  });
 }
 
 void displayTick() {
@@ -79,8 +76,7 @@ void displayTick() {
   char imu_ax_str[18], imu_ay_str[18], imu_az_str[18];
   char imu_gx_str[21], imu_gy_str[21], imu_gz_str[21];
 
-  mutex_enter_blocking(&stateMtx);
-  {
+  SAFE_STATE_UPDATE(&stateMtx, {
     sprintf(counter_str, "count: %d", state.counter);
     sprintf(bat_v_str, "Bat: %.2f V", state.battery.voltage);
     auto bat_pct = state.battery.percentage * 100;
@@ -92,8 +88,7 @@ void displayTick() {
     sprintf(imu_gx_str, "gx: %.2f dps", state.imu.gyro.x);
     sprintf(imu_gy_str, "gy: %.2f dps", state.imu.gyro.y);
     sprintf(imu_gz_str, "gz: %.2f dps", state.imu.gyro.z);
-  }
-  mutex_exit(&stateMtx);
+  });
 
   // drawing
   display.startWrite();
@@ -174,17 +169,11 @@ void setup() {
 void loop() {
   // run code on processor core 0
   delay(1000);
-
-  mutex_enter_blocking(&stateMtx);
-  state.counter += 1;
-  mutex_exit(&stateMtx);
+  SAFE_STATE_UPDATE(&stateMtx, { state.counter += 1; });
 }
 
 void loop1() {
   // run code on processor core 1
   delay(2000);
-
-  mutex_enter_blocking(&stateMtx);
-  state.counter += 2;
-  mutex_exit(&stateMtx);
+  SAFE_STATE_UPDATE(&stateMtx, { state.counter += 2; });
 }
