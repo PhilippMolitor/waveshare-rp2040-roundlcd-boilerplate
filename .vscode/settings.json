@@ -1,3 +1,11 @@
 {
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "files.associations": {
+    "optional": "cpp",
+    "functional": "cpp",
+    "random": "cpp",
+    "ostream": "cpp",
+    "stop_token": "cpp",
+    "streambuf": "cpp"
+  }
 }
