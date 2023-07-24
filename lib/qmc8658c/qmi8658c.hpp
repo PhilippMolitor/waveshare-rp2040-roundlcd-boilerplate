@@ -111,7 +111,6 @@ class QMI8658C {
   uint8_t i2cReadRegisterBlock(uint8_t start_register,
                                uint8_t length,
                                uint8_t* buffer);
-  uint16_t floatToFixed(float value, uint8_t int_bits, uint8_t fraction_bits);
 
  public:
   /// Gyroscope scale in dps (degrees per second)
@@ -168,11 +167,11 @@ class QMI8658C {
   enum class AccLPF : uint8_t {
     /// Bandwidth: 2.62% of ODR
     ACC_LPF_2_62PCT = 0b00,
-    /// Bandwidth: 2.62% of ODR
+    /// Bandwidth: 3.59% of ODR
     ACC_LPF_3_59PCT = 0b01,
-    /// Bandwidth: 2.62% of ODR
+    /// Bandwidth: 5.32% of ODR
     ACC_LPF_5_32PCT = 0b10,
-    /// Bandwidth: 2.62% of ODR
+    /// Bandwidth: 14% of ODR
     ACC_LPF_14PCT = 0b11,
     /// Disables the accelerometer low-pass filter
     ACC_LPF_DISABLED = 0b1111'1111,
@@ -224,11 +223,11 @@ class QMI8658C {
   enum class GyroLPF : uint8_t {
     /// Bandwidth: 2.62% of ODR
     GYRO_LPF_2_62PCT = 0b00,
-    /// Bandwidth: 2.62% of ODR
+    /// Bandwidth: 3.59% of ODR
     GYRO_LPF_3_59PCT = 0b01,
-    /// Bandwidth: 2.62% of ODR
+    /// Bandwidth: 5.32% of ODR
     GYRO_LPF_5_32PCT = 0b10,
-    /// Bandwidth: 2.62% of ODR
+    /// Bandwidth: 14% of ODR
     GYRO_LPF_14PCT = 0b11,
     /// Disables the gyroscope low-pass filter
     GYRO_LPF_DISABLED = 0b1111'1111,

@@ -3,6 +3,15 @@
 
 #include "qmi8658c.hpp"
 
+static uint16_t floatToFixed(float value,
+                             uint8_t int_bits,
+                             uint8_t fraction_bits) {
+  int16_t integer_part = static_cast<int16_t>(value);
+  int16_t fraction_part =
+      static_cast<int16_t>((value - integer_part) * (1 << fraction_bits));
+  return (integer_part << fraction_bits) + fraction_part;
+}
+
 bool QMI8658C::detectDevice() {
   m_deviceId = 0;
   m_deviceRevision = 0;
@@ -50,15 +59,6 @@ uint8_t QMI8658C::i2cReadRegisterBlock(uint8_t start_register,
       read++;
 
   return read;
-}
-
-uint16_t QMI8658C::floatToFixed(float value,
-                                uint8_t int_bits,
-                                uint8_t fraction_bits) {
-  int16_t integer_part = static_cast<int16_t>(value);
-  int16_t fraction_part =
-      static_cast<int16_t>((value - integer_part) * (1 << fraction_bits));
-  return (integer_part << fraction_bits) + fraction_part;
 }
 
 bool QMI8658C::begin() {
